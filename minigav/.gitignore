@@ -1,7 +1,11 @@
 # Dipendenze e build
 node_modules/
-dist/
-.angular/
+**/dist/
+**/.angular/
+
+# Log locali
+*.log
+npm-debug.log*
 
 # Configurazione locale
 .env

@@ -1,6 +1,6 @@
 import express from "express";
 import type { Server } from "http";
-class httpServer {
+export class HttpServer {
     private m_host: string;
     private m_port: number;
     private m_app: express.Application;
