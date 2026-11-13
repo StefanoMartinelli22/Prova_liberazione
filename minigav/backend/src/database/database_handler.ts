@@ -1,0 +1,2 @@
+// Gestione della persistenza SQLite.
+

@@ -1,0 +1,2 @@
+// Gestione della cache applicativa.
+

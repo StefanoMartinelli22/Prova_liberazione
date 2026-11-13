@@ -1,0 +1,20 @@
+# Dipendenze e build
+node_modules/
+dist/
+.angular/
+
+# Configurazione locale
+.env
+
+# Database locali
+backend/data/*
+!backend/data/.gitkeep
+*.sqlite
+*.sqlite3
+*.db
+
+# Editor e sistema operativo
+.idea/
+.vscode/
+.DS_Store
+
