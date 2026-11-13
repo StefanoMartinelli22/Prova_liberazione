@@ -1,22 +1,61 @@
 import express from "express";
 import type { Server } from "http";
+
+/**
+ * @brief Gestisce il server HTTP dell'applicazione MiniGAV.
+ *
+ * Configura l'applicazione Express, registra le route API e ne gestisce
+ * l'avvio e l'arresto sulla rete.
+ */
 export class HttpServer {
+    /** @brief Indirizzo di rete su cui il server ascolta. */
     private m_host: string;
+
+    /** @brief Porta TCP usata dal server HTTP. */
     private m_port: number;
+
+    /** @brief Applicazione Express su cui sono configurate le route. */
     private m_app: express.Application;
+
+    /** @brief Server HTTP Node.js creato all'avvio; assente se non avviato. */
     private m_server?: Server;
 
+    /**
+     * @brief Crea e configura il server HTTP.
+     * @param p_host Indirizzo di rete su cui il server dovrà ascoltare.
+     * @param i_port Porta TCP su cui il server dovrà ascoltare.
+     * @returns Non restituisce alcun valore.
+     *
+     * Inizializza Express e registra tutte le route dell'applicazione, ma non
+     * avvia ancora l'ascolto delle richieste.
+     */
     constructor(p_host: string, i_port: number) {
         this.m_host = p_host;
         this.m_port = i_port;
         this.m_app = express();
         this.setupRoutes();
     }
+
+    /**
+     * @brief Avvia il server HTTP.
+     * @returns Non restituisce alcun valore.
+     *
+     * Mette l'applicazione Express in ascolto sull'host e sulla porta
+     * configurati, conservando il server Node.js creato per poterlo chiudere.
+     */
     public startServer(): void {
         this.m_server = this.m_app.listen(this.m_port, this.m_host, () => {
             console.log(`Server running on http://${this.m_host}:${this.m_port}`);
         });
     }
+
+    /**
+     * @brief Registra gli endpoint HTTP esposti dall'applicazione.
+     * @returns Non restituisce alcun valore.
+     *
+     * Associa percorsi e metodi HTTP agli handler Express. In questa fase gli
+     * handler restituiscono risposte provvisorie, senza accedere al database.
+     */
     public setupRoutes() {
         this.m_app.get("/api/health", (req, res) => {
             res.status(200).send("OK");
@@ -34,6 +73,14 @@ export class HttpServer {
             res.status(200).send("Pazienti update");
         });
     }
+
+    /**
+     * @brief Arresta il server HTTP se è in esecuzione.
+     * @returns Non restituisce alcun valore.
+     *
+     * Chiude il server Node.js e termina l'accettazione di nuove richieste.
+     * Se il server non è stato avviato, segnala la condizione nella console.
+     */
     public closeServer() {
         if (!this.m_server) {
             console.log("Server is not running");
