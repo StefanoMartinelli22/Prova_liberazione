@@ -8,7 +8,21 @@
 
   <section>
     <h2>Elenco pazienti</h2>
-    <p>Qui comparirà la lista dei pazienti presenti nel database.</p>
+
+    @if (errore) {
+      <p>{{ errore }}</p>
+    } @else if (pazienti.length === 0) {
+      <p>Nessun paziente registrato.</p>
+    } @else {
+      <ul>
+        @for (paziente of pazienti; track paziente.id) {
+          <li>
+            <strong>{{ paziente.nome }} {{ paziente.cognome }}</strong>
+            <span>— nato il {{ paziente.data_nascita }}</span>
+          </li>
+        }
+      </ul>
+    }
   </section>
 
   <section>
