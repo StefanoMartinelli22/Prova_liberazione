@@ -1,9 +1,10 @@
 // Modello del paziente.
 export interface Paziente {
-    s_nome: string;
-    s_cognome: string;
-    s_data_nascita: string;
-    s_codice_fiscale: string;
-    s_telefono: string;
-
+    /** Identificativo generato da SQLite dopo l'inserimento. */
+    id?: number;
+    nome: string;
+    cognome: string;
+    data_nascita: string;
+    codice_fiscale: string;
+    telefono: string;
 }
