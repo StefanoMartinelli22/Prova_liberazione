@@ -27,6 +27,8 @@
 
   <section>
     <h2>Nuovo paziente</h2>
-    <p>Qui inseriremo il form per registrare un paziente.</p>
+    <app-paziente-form
+      (pazienteCreato)="caricaPazienti()"
+    ></app-paziente-form>
   </section>
 </main>

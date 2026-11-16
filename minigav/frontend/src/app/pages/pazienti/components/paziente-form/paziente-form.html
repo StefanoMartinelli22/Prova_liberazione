@@ -1,0 +1,30 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <label>
+    Nome
+    <input type="text" formControlName="nome" />
+  </label>
+
+  <label>
+    Cognome
+    <input type="text" formControlName="cognome" />
+  </label>
+
+  <label>
+    Data di nascita
+    <input type="date" formControlName="data_nascita" />
+  </label>
+
+  <label>
+    Codice fiscale
+    <input type="text" formControlName="codice_fiscale" />
+  </label>
+
+  <label>
+    Telefono
+    <input type="tel" formControlName="telefono" />
+  </label>
+
+  <button type="submit" [disabled]="form.invalid">
+    Salva paziente
+  </button>
+</form>

@@ -2,9 +2,10 @@ import { RouterLink } from '@angular/router';
 import { Component, inject, OnInit } from '@angular/core';
 import { Paziente } from '../../models/paziente.model';
 import { PazientiService } from '../../services/pazienti';
+import { PazienteForm } from './components/paziente-form/paziente-form';
 @Component({
   selector: 'app-pazienti',
-  imports: [RouterLink],
+  imports: [RouterLink, PazienteForm],
   templateUrl: './pazienti.html',
   styleUrl: './pazienti.scss',
 })
