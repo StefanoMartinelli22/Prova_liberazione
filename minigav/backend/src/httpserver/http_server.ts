@@ -1,6 +1,7 @@
 import express from "express";
 import type { Server } from "http";
-
+import { anagrafica } from "../anagrafica/anagrafica";
+import cors from 'cors';
 /**
  * @brief Gestisce il server HTTP dell'applicazione MiniGAV.
  *
@@ -20,19 +21,29 @@ export class HttpServer {
     /** @brief Server HTTP Node.js creato all'avvio; assente se non avviato. */
     private m_server?: Server;
 
+    /** @brief Servizio applicativo delegato dalle route relative ai pazienti. */
+    private m_anagrafica: anagrafica;
+
     /**
      * @brief Crea e configura il server HTTP.
      * @param p_host Indirizzo di rete su cui il server dovrà ascoltare.
-     * @param i_port Porta TCP su cui il server dovrà ascoltare.
+     * @param p_port Porta TCP su cui il server dovrà ascoltare.
+     * @param p_anagrafica Servizio che gestisce i casi d'uso dei pazienti.
      * @returns Non restituisce alcun valore.
      *
      * Inizializza Express e registra tutte le route dell'applicazione, ma non
      * avvia ancora l'ascolto delle richieste.
      */
-    constructor(p_host: string, i_port: number) {
+    constructor(p_host: string, p_port: number, p_anagrafica: anagrafica) {
         this.m_host = p_host;
-        this.m_port = i_port;
+        this.m_port = p_port;
         this.m_app = express();
+        this.m_app.use(cors({
+            origin: 'http://localhost:4200',
+            methods: ['GET', 'POST', 'DELETE'],
+        }));
+        this.m_app.use(express.json());
+        this.m_anagrafica = p_anagrafica;
         this.setupRoutes();
     }
 
@@ -53,24 +64,31 @@ export class HttpServer {
      * @brief Registra gli endpoint HTTP esposti dall'applicazione.
      * @returns Non restituisce alcun valore.
      *
-     * Associa percorsi e metodi HTTP agli handler Express. In questa fase gli
-     * handler restituiscono risposte provvisorie, senza accedere al database.
+     * Associa percorsi e metodi HTTP agli handler Express. Gli handler delegano
+     * le operazioni sui pazienti al servizio Anagrafica.
      */
     public setupRoutes() {
         this.m_app.get("/api/health", (req, res) => {
             res.status(200).send("OK");
         });
         this.m_app.get("/api/pazienti/view", (req, res) => {
-            res.status(200).send("Pazienti view");
+            const l_pazienti = this.m_anagrafica.mostraPazienti();
+            res.status(200).json(l_pazienti);
         });
         this.m_app.post("/api/pazienti/add", (req, res) => {
+            this.m_anagrafica.inserisciPaziente(req.body);
             res.status(200).send("Pazienti add");
+
         });
-        this.m_app.post("/api/pazienti/delete", (req, res) => {
+        this.m_app.delete("/api/pazienti/delete", (req, res) => {
+            this.m_anagrafica.eliminaPaziente(req.body);
             res.status(200).send("Pazienti delete");
+
         });
+
         this.m_app.get("/api/pazienti/update", (req, res) => {
             res.status(200).send("Pazienti update");
+
         });
     }
 
