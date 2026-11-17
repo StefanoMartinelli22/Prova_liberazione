@@ -1,34 +1,39 @@
-<main>
-  <header>
-    <h1>Pazienti</h1>
-    <p>Consulta e gestisci le anagrafiche registrate.</p>
+<main class="patients-page">
+  <header class="page-header">
+    <a class="back-link" routerLink="/">← Torna alla home</a>
 
-    <a routerLink="/">Torna alla Home</a>
+    <p class="eyebrow">MiniGAV</p>
+    <h1>Pazienti</h1>
+    <p class="page-description">
+      Consulta l’archivio e registra nuove anagrafiche pazienti.
+    </p>
   </header>
 
-  <section>
-    <h2>Elenco pazienti</h2>
+  <div class="patients-layout">
+    <section class="content-card" aria-labelledby="patient-list-title">
+      <h2 id="patient-list-title">Elenco pazienti</h2>
 
-    @if (errore) {
-      <p>{{ errore }}</p>
-    } @else if (pazienti.length === 0) {
-      <p>Nessun paziente registrato.</p>
-    } @else {
-      <ul>
-        @for (paziente of pazienti; track paziente.id) {
-          <li>
-            <strong>{{ paziente.nome }} {{ paziente.cognome }}</strong>
-            <span>— nato il {{ paziente.data_nascita }}</span>
-          </li>
-        }
-      </ul>
-    }
-  </section>
+      @if (errore) {
+        <p class="state-message error-message">{{ errore }}</p>
+      } @else if (pazienti.length === 0) {
+        <p class="state-message">Nessun paziente registrato.</p>
+      } @else {
+        <ul class="patient-list">
+          @for (paziente of pazienti; track paziente.id) {
+            <li class="patient-item">
+              <strong>{{ paziente.nome }} {{ paziente.cognome }}</strong>
+              <span>Nato il {{ paziente.data_nascita }}</span>
+            </li>
+          }
+        </ul>
+      }
+    </section>
 
-  <section>
-    <h2>Nuovo paziente</h2>
-    <app-paziente-form
-      (pazienteCreato)="caricaPazienti()"
-    ></app-paziente-form>
-  </section>
+    <section class="content-card" aria-labelledby="new-patient-title">
+      <h2 id="new-patient-title">Nuovo paziente</h2>
+      <app-paziente-form
+        (pazienteCreato)="caricaPazienti()"
+      ></app-paziente-form>
+    </section>
+  </div>
 </main>

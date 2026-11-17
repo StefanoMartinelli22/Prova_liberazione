@@ -1,30 +1,40 @@
-<form [formGroup]="form" (ngSubmit)="onSubmit()">
-  <label>
-    Nome
-    <input type="text" formControlName="nome" />
-  </label>
+<form class="patient-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+  <div class="form-field">
+    <label for="nome">Nome</label>
+    <input id="nome" type="text" formControlName="nome" required />
+  </div>
 
-  <label>
-    Cognome
-    <input type="text" formControlName="cognome" />
-  </label>
+  <div class="form-field">
+    <label for="cognome">Cognome</label>
+    <input id="cognome" type="text" formControlName="cognome" required />
+  </div>
 
-  <label>
-    Data di nascita
-    <input type="date" formControlName="data_nascita" />
-  </label>
+  <div class="form-field">
+    <label for="data-nascita">Data di nascita</label>
+    <input
+      id="data-nascita"
+      type="date"
+      formControlName="data_nascita"
+      required
+    />
+  </div>
 
-  <label>
-    Codice fiscale
-    <input type="text" formControlName="codice_fiscale" />
-  </label>
+  <div class="form-field">
+    <label for="codice-fiscale">Codice fiscale</label>
+    <input
+      id="codice-fiscale"
+      type="text"
+      formControlName="codice_fiscale"
+      required
+    />
+  </div>
 
-  <label>
-    Telefono
-    <input type="tel" formControlName="telefono" />
-  </label>
+  <div class="form-field">
+    <label for="telefono">Telefono</label>
+    <input id="telefono" type="tel" formControlName="telefono" required />
+  </div>
 
-  <button type="submit" [disabled]="form.invalid">
+  <button class="submit-button" type="submit" [disabled]="form.invalid">
     Salva paziente
   </button>
 </form>

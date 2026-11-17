@@ -1,6 +1,17 @@
-<main>
-  <h1>MiniGAV</h1>
-  <p>Gestione delle anagrafiche pazienti.</p>
+<main class="home-page">
+  <section class="hero-card" aria-labelledby="home-title">
+    <p class="eyebrow">MiniGAV</p>
 
-  <a routerLink="/pazienti">Avanti</a>
+    <h1 id="home-title">Gestione anagrafiche pazienti</h1>
+
+    <p class="description">
+      Consulta l’archivio, inserisci nuovi pazienti e mantieni aggiornati i dati.
+    </p>
+
+    <a class="primary-button" routerLink="/pazienti">
+      Gestisci pazienti
+    </a>
+
+    <p class="technical-note">Archivio locale · SQLite</p>
+  </section>
 </main>
