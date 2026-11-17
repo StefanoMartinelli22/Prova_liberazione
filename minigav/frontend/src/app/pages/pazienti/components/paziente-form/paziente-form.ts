@@ -1,4 +1,5 @@
 import { Component, EventEmitter, inject, Output } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import {
   NonNullableFormBuilder,
   ReactiveFormsModule,
@@ -40,13 +41,30 @@ export class PazienteForm {
     const paziente: PazienteDaCreare = this.form.getRawValue();
 
     this.pazientiService.creaPaziente(paziente).subscribe({
-      next: () => {
+      next: (risultato) => {
         this.form.reset();
-        console.log('Paziente salvato con successo.');
+        console.log(risultato.messaggio);
         this.pazienteCreato.emit();
       },
-      error: () => {
-        console.error('Impossibile salvare il paziente.');
+      error: (errore: HttpErrorResponse) => {
+        if (errore.status === 0) {
+          console.error('Errore di connessione al server.');
+          return;
+        }
+
+        const messaggio = errore.error?.messaggio ?? 'Errore durante il salvataggio del paziente.';
+
+        if (errore.status === 400) {
+          console.error(messaggio);
+          return;
+        }
+
+        if (errore.status === 409) {
+          console.error(messaggio);
+          return;
+        }
+
+        console.error(messaggio);
       },
     });
   }

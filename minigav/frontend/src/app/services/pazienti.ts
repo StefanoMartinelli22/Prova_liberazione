@@ -1,7 +1,11 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Paziente, PazienteDaCreare } from '../models/paziente.model';
+import {
+  Paziente,
+  PazienteDaCreare,
+  RisultatoOperazionePaziente,
+} from '../models/paziente.model';
 
 @Injectable({
   providedIn: 'root',
@@ -14,11 +18,12 @@ export class PazientiService {
     return this.http.get<Paziente[]>(`${this.apiUrl}/view`);
   }
 
-  public creaPaziente(paziente: PazienteDaCreare): Observable<string> {
-    return this.http.post(
+  public creaPaziente(
+    paziente: PazienteDaCreare,
+  ): Observable<RisultatoOperazionePaziente> {
+    return this.http.post<RisultatoOperazionePaziente>(
       `${this.apiUrl}/add`,
       paziente,
-      { responseType: 'text' },
     );
   }
 }

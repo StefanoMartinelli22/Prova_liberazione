@@ -23,11 +23,20 @@ export class Pazienti implements OnInit {
 
     this.pazientiService.getPazienti().subscribe({
       next: (pazienti) => {
+        console.log('Pazienti caricati con successo:', pazienti);
         this.pazienti = pazienti;
       },
-      error: () => {
-        this.errore = 'Impossibile caricare i pazienti.';
-      },
+      error: (errore) => {
+        console.log('Error status:', errore.status);
+        if (errore.status === 0) {          
+          this.errore = 'Errore di connessione al server'
+
+        
+        }
+        if (errore.status === 404) {         
+          this.errore = 'Pazienti non trovati'
+        }
+      }
     });
   }
 }
