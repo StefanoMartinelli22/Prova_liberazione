@@ -4,6 +4,12 @@
  */
 import { Paziente } from './models/paziente';
 import { DatabaseHandler } from '../database/database_handler';
+import { CodiceFiscaleDuplicatoError } from '../database/errors/codice-fiscale-duplicato-error';
+import {
+    EsitoOperazionePaziente,
+    RisultatoEliminazionePaziente,
+    RisultatoInserimentoPaziente
+} from './models/risultati-operazioni-paziente';
 
 /**
  * @brief Coordina validazione dei pazienti e persistenza su database.
@@ -15,6 +21,7 @@ import { DatabaseHandler } from '../database/database_handler';
 export class anagrafica {
     /** @brief Gestore del database usato per salvare e leggere i pazienti. */
     private m_dbHandler: DatabaseHandler;
+
 
     /**
      * @brief Crea il servizio anagrafico.
@@ -34,25 +41,39 @@ export class anagrafica {
      * Controlla i dati obbligatori, codice fiscale, telefono e data di nascita;
      * dopo la validazione delega l'inserimento a DatabaseHandler.
      */
-    public inserisciPaziente(p_paziente : Paziente) : void {
+    public inserisciPaziente(p_paziente: Paziente): RisultatoInserimentoPaziente {
         if (!p_paziente) {
-            throw new Error("Oggetto paziente non fornito.");
+            return { esito: EsitoOperazionePaziente.DATI_NON_VALIDI, messaggio: "Oggetto paziente non fornito." };
+
+
         }
         if (!p_paziente.nome || !p_paziente.cognome || !p_paziente.data_nascita || !p_paziente.codice_fiscale || !p_paziente.telefono) {
-            throw new Error("Dati del paziente incompleti.");
+
+            return { esito: EsitoOperazionePaziente.DATI_NON_VALIDI, messaggio: "Dati del paziente incompleti." };
         }
         if (!this.validaCodiceFiscale(p_paziente.codice_fiscale)) {
-            throw new Error("Codice fiscale non valido. Deve essere lungo 16 caratteri.");
+            return { esito: EsitoOperazionePaziente.DATI_NON_VALIDI, messaggio: "Codice fiscale non valido. Deve essere lungo 16 caratteri." };
         }
 
         if (!this.validaTelefono(p_paziente.telefono)) {
-            throw new Error("Numero di telefono non valido. Deve essere lungo tra 10 e 15 caratteri.");
+            return { esito: EsitoOperazionePaziente.DATI_NON_VALIDI, messaggio: "Numero di telefono non valido. Deve essere lungo tra 10 e 15 caratteri." };
         }
         if (!this.validaDataNascita(p_paziente.data_nascita)) {
-            throw new Error("Data di nascita non valida.");
+            return { esito: EsitoOperazionePaziente.DATI_NON_VALIDI, messaggio: "Data di nascita non valida." };
         }
-        this.m_dbHandler.CreaPaziente(p_paziente);
+        try {
+            this.m_dbHandler.CreaPaziente(p_paziente);
+            return {
+                esito: EsitoOperazionePaziente.CREATO,
+                messaggio: 'Paziente inserito con successo.'
+            };
+        } catch (errore) {
+            if (errore instanceof CodiceFiscaleDuplicatoError) {
+                return { esito: EsitoOperazionePaziente.CF_GIA_PRESENTE, messaggio: "Codice fiscale già presente nel database." };
+            }
 
+            throw errore;
+        }
     }
 
     /**
@@ -61,15 +82,17 @@ export class anagrafica {
      * @returns Non restituisce alcun valore.
      * @throws Error Se manca il paziente o il suo codice fiscale non è valido.
      */
-    public eliminaPaziente(p_paziente : Paziente) : void {
-        if (! p_paziente) {
-            throw new Error("Oggetto paziente non fornito.");
+    public eliminaPaziente(p_paziente: Paziente): RisultatoEliminazionePaziente {
+        if (!p_paziente) {
+
+            return { esito: EsitoOperazionePaziente.DATI_NON_VALIDI, messaggio: "Oggetto paziente non fornito." };
         }
         if (!p_paziente.codice_fiscale || !this.validaCodiceFiscale(p_paziente.codice_fiscale)) {
-            throw new Error("Codice fiscale del paziente non valido.");
+            return { esito: EsitoOperazionePaziente.DATI_NON_VALIDI, messaggio: "Codice fiscale del paziente non valido." };
         }
 
         this.m_dbHandler.EliminaPaziente(p_paziente);
+        return { esito: EsitoOperazionePaziente.ELIMINATO, messaggio: 'Paziente eliminato con successo.' };
     }
 
     /**
@@ -78,7 +101,7 @@ export class anagrafica {
      *
      * Delega la lettura completa al DatabaseHandler.
      */
-    public mostraPazienti() : Paziente [] {
+    public mostraPazienti(): Paziente[] {
         return this.m_dbHandler.MostraPazienti();
     }
 

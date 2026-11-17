@@ -2,6 +2,7 @@ import express from "express";
 import type { Server } from "http";
 import { anagrafica } from "../anagrafica/anagrafica";
 import cors from 'cors';
+import { EsitoOperazionePaziente } from "../anagrafica/models/risultati-operazioni-paziente";
 /**
  * @brief Gestisce il server HTTP dell'applicazione MiniGAV.
  *
@@ -76,17 +77,38 @@ export class HttpServer {
             res.status(200).json(l_pazienti);
         });
         this.m_app.post("/api/pazienti/add", (req, res) => {
-            this.m_anagrafica.inserisciPaziente(req.body);
-            res.status(200).send("Pazienti add");
-
+            try {
+                const risultato = this.m_anagrafica.inserisciPaziente(req.body);
+                if (risultato.esito === EsitoOperazionePaziente.DATI_NON_VALIDI) {
+                    res.status(400).json(risultato);
+                }
+                else if (risultato.esito === EsitoOperazionePaziente.CF_GIA_PRESENTE) {
+                    res.status(409).json(risultato);
+                }
+                else {
+                    res.status(201).json(risultato);
+                }
+            } catch (errore) {
+                console.error('Errore durante la creazione del paziente:', errore);
+                res.status(500).json({
+                    esito: 'ERRORE_INTERNO',
+                    messaggio: 'Errore interno del server.'
+                });
+            }
         });
         this.m_app.delete("/api/pazienti/delete", (req, res) => {
-            this.m_anagrafica.eliminaPaziente(req.body);
-            res.status(200).send("Pazienti delete");
+
+            const risultato = this.m_anagrafica.eliminaPaziente(req.body);
+            if (risultato.esito === EsitoOperazionePaziente.DATI_NON_VALIDI) {
+                res.status(400).json({ messaggio: risultato.messaggio });
+            } else {
+                res.status(200).json({ messaggio: risultato.messaggio });
+            }
 
         });
 
         this.m_app.get("/api/pazienti/update", (req, res) => {
+            res.status(500).send("Errore Interno del Server");
             res.status(200).send("Pazienti update");
 
         });

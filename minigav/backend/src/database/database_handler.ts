@@ -4,6 +4,7 @@
  */
 import Database from "better-sqlite3";
 import type { Paziente } from "../anagrafica/models/paziente.ts";
+import { CodiceFiscaleDuplicatoError } from './errors/codice-fiscale-duplicato-error';
 
 /**
  * @brief Gestisce la connessione SQLite e le query sulla tabella pazienti.
@@ -64,11 +65,24 @@ export class DatabaseHandler {
      * applica i vincoli definiti nello schema, incluso il codice fiscale unico.
      */
     public CreaPaziente(m_paziente: Paziente): void {
+
         const l_statement = this.m_db.prepare(`
             INSERT INTO pazienti (nome, cognome, data_nascita, codice_fiscale, telefono)
             VALUES (@nome, @cognome, @data_nascita, @codice_fiscale, @telefono)
         `);
-        l_statement.run(m_paziente);
+
+        try {
+            l_statement.run(m_paziente);
+        } catch (errore) {
+            if (
+                errore instanceof Database.SqliteError &&
+                errore.code === 'SQLITE_CONSTRAINT_UNIQUE'
+            ) {
+                throw new CodiceFiscaleDuplicatoError();
+            }
+
+            throw errore;
+        }
 
     }
 
@@ -95,7 +109,7 @@ export class DatabaseHandler {
      * ottenute. In una fase successiva il metodo restituirà l'elenco al
      * chiamante, invece di stamparlo direttamente.
      */
-    public MostraPazienti(): Paziente [] {
+    public MostraPazienti(): Paziente[] {
         const l_statement = this.m_db.prepare("SELECT * FROM pazienti");
         const l_pazienti = l_statement.all() as Paziente[];
         console.log("Pazienti nel database:", l_pazienti);
